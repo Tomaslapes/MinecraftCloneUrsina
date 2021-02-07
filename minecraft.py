@@ -1,9 +1,8 @@
-from ursina import Ursina, Button, application,scene,Vec3,color,round_to_closest,mouse,destroy,lerp,held_keys,Sky,Entity,DirectionalLight
+from ursina import Ursina, Button, application,scene,Vec3,color,round_to_closest,mouse,destroy,lerp,held_keys,Sky,Entity,DirectionalLight,Texture
 from ursina.prefabs.first_person_controller import FirstPersonController
 from ursina.ursinastuff import print_on_screen
 from ursina.shaders import lit_with_shadows_shader
 
-from math import cos,sin
 from perlin_noise import PerlinNoise
 from random import randrange
 
@@ -11,7 +10,7 @@ PLAYER_SPEED = 5
 PAYER_RUN_SPEED = 8
 
 class Block(Button):
-    def __init__(self,position_block,texture = "Textures/CubeTex5.png"):
+    def __init__(self,position_block,texture = "Textures/CubeTex5Small.png"):
         super().__init__(self,
         parent = scene,
         shader=lit_with_shadows_shader,
@@ -23,7 +22,7 @@ class Block(Button):
         position = position_block)
 
 class Tree():
-    def __init__(self,position,height,num_of_leaves,texture = "Textures/Wood2.png"):
+    def __init__(self,position,height,num_of_leaves,texture = "Textures/Wood2Small.png"):
         base = []
         for i in range(height):
             block = Block((position[0],position[1]+i,position[2]),texture)
@@ -31,7 +30,7 @@ class Tree():
         x = position[0]
         z = position[2]
         y = position[1]+height
-        leaves_tex = "Textures/Leaves.jpg"
+        leaves_tex = "Textures/LeavesSmall.png"
         Block((x,y,z),leaves_tex)
         Block((x+1,y,z),leaves_tex)
         Block((x-1,y,z),leaves_tex)
@@ -40,10 +39,11 @@ class Tree():
         Block((x,y+1,z),leaves_tex)
 
 
-noise = PerlinNoise(octaves=10, seed=1)
+noise = PerlinNoise(octaves=5, seed=17)
 
 app = Ursina()
 
+Texture.default_filtering = None
 sky = Sky()
 
 sun = DirectionalLight(y=2, z=3, shadows=True,shadow_map_resolution = (1024,1024))
@@ -66,14 +66,14 @@ def input(key):
         print_on_screen("Walk")
 
 blocks = []
-for z in range(32):
-    for x in range(32):
+for z in range(128):
+    for x in range(128):
         
         y = noise([z/100,x/100])
         y = round_to_closest(y*10,1)
 
         tree_ = randrange(0,100)
-        if tree_ % 20 == 0:
+        if tree_ % 28 == 0:
             Tree((x,y+1,z),4,10)
         print(y)
         block = Block(Vec3(x,y,z))
@@ -81,6 +81,6 @@ for z in range(32):
 
 
 
-player = FirstPersonController(jump_duration = 0.25,jump_height = 1,gravity = 1)
+player = FirstPersonController(jump_duration = 0.75,jump_height = 1,gravity = 1)
 
 app.run()
